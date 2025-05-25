@@ -23,6 +23,8 @@ namespace trabalho_bd_log.src
             foreach (var operacao in logs)
                 Console.WriteLine($"id: {operacao.Id}, transação: {operacao.Operacao}, id-cliente: {operacao.IdCliente}, nome: {operacao.Nome}, saldo: {operacao.Saldo}");
 
+            RecuperarTabelaClientesEmMemoria(conexaoBanco, logs);
+
         }
        
         #endregion
@@ -56,6 +58,52 @@ namespace trabalho_bd_log.src
 
             consulta.Close();
             return logs;
+        }
+
+        private void RecuperarTabelaClientesEmMemoria(NpgsqlConnection conexaoBanco, List<Log> logs)
+        {
+            CriarTabelaSeNaoExistir(conexaoBanco);
+
+            using var transaction = conexaoBanco.BeginTransaction();
+
+            foreach (var op in logs)
+            {
+                string sql = "";
+
+                if (op.Operacao == "INSERT")
+                    sql = "INSERT INTO clientes_em_memoria (id, nome, saldo) VALUES (@id, @nome, @saldo) ON CONFLICT (id) DO NOTHING;";
+                else if (op.Operacao == "UPDATE")
+                    sql = "UPDATE clientes_em_memoria SET nome = @nome, saldo = @saldo WHERE id = @id;";
+                else if (op.Operacao == "DELETE")
+                    sql = "DELETE FROM clientes_em_memoria WHERE id = @id;";
+
+                using var cmdRedo = new NpgsqlCommand(sql, conexaoBanco);
+                cmdRedo.Parameters.AddWithValue("id", op.IdCliente);
+
+                if (op.Operacao != "DELETE")
+                {
+                    cmdRedo.Parameters.AddWithValue("nome", op.Nome ?? (object)DBNull.Value);
+                    cmdRedo.Parameters.AddWithValue("saldo", op.Saldo);
+                }
+
+                int rowsAffected = cmdRedo.ExecuteNonQuery();
+                Console.WriteLine($"Operação {op.Operacao} no registro {op.IdCliente} executada, linhas afetadas: {rowsAffected}");
+            }
+
+            transaction.Commit();
+        }
+
+        private void CriarTabelaSeNaoExistir(NpgsqlConnection conexaoBanco)
+        {
+            string sql = @"
+            CREATE UNLOGGED TABLE IF NOT EXISTS clientes_em_memoria (
+            id SERIAL PRIMARY KEY,
+            nome TEXT,
+            saldo NUMERIC
+        );";
+
+            using var cmd = new NpgsqlCommand(sql, conexaoBanco);
+            cmd.ExecuteNonQuery();
         }
 
         #endregion
