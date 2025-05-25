@@ -4,7 +4,7 @@ namespace trabalho_bd_log.src
 {
     public class Redo
     {
-        private static string connectionString = "Host=localhost;" + "Username=postgres;" + "Password=postgres;" + "Database=banco_log";
+        private static string connectionString = "Host=localhost;" + "Username=postgres;" + "Password=kafer;" + "Database=banco_log";
 
         #region Public Methods
 
@@ -87,7 +87,16 @@ namespace trabalho_bd_log.src
                 }
 
                 int rowsAffected = cmdRedo.ExecuteNonQuery();
-                Console.WriteLine($"Operação {op.Operacao} no registro {op.IdCliente} executada, linhas afetadas: {rowsAffected}");
+                Console.WriteLine($"Operação {op.Operacao} no registro {op.IdCliente} executada");
+
+                if (op.Operacao != "DELETE")
+                {
+                    Console.WriteLine($"Dados aplicados -> Id: {op.IdCliente}, Nome: {op.Nome}, Saldo: {op.Saldo}");
+                }
+                else
+                {
+                    Console.WriteLine($"Dados removidos -> Id: {op.IdCliente}");
+                }
             }
 
             transaction.Commit();
