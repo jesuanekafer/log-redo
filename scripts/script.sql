@@ -6,7 +6,7 @@
 --);
 
 --CREATE TABLE log (
---	id SERIAL PRIMARY KEY
+--	id SERIAL PRIMARY key,
 --	operacao TEXT, 
 --	id_cliente INT, 
 --	nome TEXT, 

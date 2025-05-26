@@ -62,7 +62,6 @@ namespace trabalho_bd_log.src
 
         private void RecuperarTabelaClientesEmMemoria(NpgsqlConnection conexaoBanco, List<Log> logs)
         {
-            CriarTabelaSeNaoExistir(conexaoBanco);
 
             using var transaction = conexaoBanco.BeginTransaction();
 
@@ -102,18 +101,7 @@ namespace trabalho_bd_log.src
             transaction.Commit();
         }
 
-        private void CriarTabelaSeNaoExistir(NpgsqlConnection conexaoBanco)
-        {
-            string sql = @"
-            CREATE UNLOGGED TABLE IF NOT EXISTS clientes_em_memoria (
-            id SERIAL PRIMARY KEY,
-            nome TEXT,
-            saldo NUMERIC
-        );";
-
-            using var cmd = new NpgsqlCommand(sql, conexaoBanco);
-            cmd.ExecuteNonQuery();
-        }
+        
 
         #endregion
     }
