@@ -27,7 +27,7 @@ private static string connectionString = "Host=localhost;Username=seu_usuario;Pa
 
 ```
 
-1. Garanta que exista uma tabela `log` com os campos usados pelo programa (`id`, `operacao`, `id_cliente`, `nome`, `saldo`). A criação da tabela pode ser feita seguindo o definido o arquivo scripts/script.sql:
+1. Garanta que exista uma tabela `log` com os campos usados pelo programa (`txid`, `operacao`, `id_cliente`, `nome`, `saldo`). A criação da tabela pode ser feita seguindo o definido o arquivo scripts/script.sql:
 
 ---
 
